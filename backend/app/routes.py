@@ -18,7 +18,7 @@ def register_routes(app):
     # ──────────────────────────────────────────
     @app.route("/")
     def home():
-        return jsonify({"message": "FocusFlow API is running ✅"}), 200
+        return jsonify({"message": "Productivity App API is running ✅"}), 200
 
 
     # ──────────────────────────────────────────
@@ -38,11 +38,11 @@ def register_routes(app):
 
         # Validate required fields
         if not username or not password:
-            return jsonify({"error": "Username and password are required"}), 400
+            return jsonify({"errors": ["Username and password are required"]}), 400
 
         # Enforce unique usernames (rubric requirement)
         if User.query.filter_by(username=username).first():
-            return jsonify({"error": "Username already taken"}), 400
+            return jsonify({"errors": ["Username already taken"]}), 400
 
         user = User(username=username)
         user.set_password(password)  # Hashes with bcrypt
@@ -54,7 +54,7 @@ def register_routes(app):
         token = create_access_token(identity=user.id)
         return jsonify({
             "user": user_schema.dump(user),
-            "access_token": token
+            "token": token
         }), 201
 
 
@@ -74,12 +74,12 @@ def register_routes(app):
 
         if not user or not user.check_password(data.get("password", "")):
             # Generic message — don't reveal whether username or password was wrong
-            return jsonify({"error": "Invalid username or password"}), 401
+            return jsonify({"errors": ["Invalid username or password"]}), 401
 
         token = create_access_token(identity=user.id)
         return jsonify({
             "user": user_schema.dump(user),
-            "access_token": token
+            "token": token
         }), 200
 
 
@@ -98,7 +98,7 @@ def register_routes(app):
         user = db.session.get(User, user_id)  # SQLAlchemy 2.x compatible
 
         if not user:
-            return jsonify({"error": "User not found"}), 404
+            return jsonify({"errors": ["User not found"]}), 404
 
         return jsonify(user_schema.dump(user)), 200
 
@@ -148,7 +148,7 @@ def register_routes(app):
         task = Task.query.filter_by(id=id, user_id=user_id).first()
 
         if not task:
-            return jsonify({"error": "Task not found"}), 404
+            return jsonify({"errors": ["Task not found"]}), 404
 
         return jsonify(task_schema.dump(task)), 200
 
@@ -168,7 +168,7 @@ def register_routes(app):
         data = request.get_json()
 
         if not data.get("title"):
-            return jsonify({"error": "Title is required"}), 400
+            return jsonify({"errors": ["Title is required"]}), 400
 
         task = Task(
             title=data["title"],
@@ -197,7 +197,7 @@ def register_routes(app):
         task = Task.query.filter_by(id=id, user_id=user_id).first()
 
         if not task:
-            return jsonify({"error": "Task not found"}), 404
+            return jsonify({"errors": ["Task not found"]}), 404
 
         data = request.get_json()
 
@@ -226,7 +226,7 @@ def register_routes(app):
         task = Task.query.filter_by(id=id, user_id=user_id).first()
 
         if not task:
-            return jsonify({"error": "Task not found"}), 404
+            return jsonify({"errors": ["Task not found"]}), 404
 
         db.session.delete(task)
         db.session.commit()

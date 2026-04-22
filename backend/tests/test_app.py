@@ -47,7 +47,7 @@ def auth(client):
     def _auth(username="alice", password="pass123"):
         client.post("/signup", json={"username": username, "password": password})
         res = client.post("/login", json={"username": username, "password": password})
-        return res.get_json()["access_token"]
+        return res.get_json()["token"]
     return _auth
 
 
@@ -77,7 +77,7 @@ class TestSignup:
         data = res.get_json()
 
         assert res.status_code == 201
-        assert "access_token" in data          # Logged in immediately
+        assert "token" in data          # Logged in immediately
         assert data["user"]["username"] == "lydia"
         assert "password" not in data["user"]  # Password hash never exposed
 
@@ -87,7 +87,7 @@ class TestSignup:
         res = client.post("/signup", json={"username": "lydia", "password": "pass2"})
 
         assert res.status_code == 400
-        assert "error" in res.get_json()
+        assert "errors" in res.get_json()
 
     def test_signup_missing_fields(self, client):
         """Missing username or password returns 400."""
@@ -105,7 +105,7 @@ class TestLogin:
         data = res.get_json()
 
         assert res.status_code == 200
-        assert "access_token" in data
+        assert "token" in data
 
     def test_login_wrong_password(self, client):
         """Wrong password returns 401 — not 403 or 404."""
