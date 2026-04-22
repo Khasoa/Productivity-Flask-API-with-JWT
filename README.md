@@ -1,4 +1,4 @@
-# Productivity Task API with JWT
+# Productivity Flask API with JWT
 
 A full-stack productivity project built with a Flask backend API and a React frontend client using JWT authentication. Users can register, log in securely, remain authenticated after refresh, and manage personal tasks through protected API endpoints.
 
